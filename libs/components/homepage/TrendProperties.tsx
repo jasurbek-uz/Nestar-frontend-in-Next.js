@@ -36,6 +36,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
       setTrendProperties(data?.getProperties?.list);
     }
   });
+  
 	/** HANDLERS **/
 
 	if (trendProperties) console.log('trendProperties:', trendProperties);
