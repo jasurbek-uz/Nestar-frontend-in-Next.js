@@ -28,7 +28,7 @@ const PopularProperties = (props: PopularPropertiesProps) => {
 			loading: getPropertiesLoading,
 			data: getPropertiesData,
 			error: getPropertiesError,
-			refetch: getPropertiesRefresh,
+			refetch: getPropertiesRefetch,
 		} = useQuery(GET_PROPERTIES, {
 			fetchPolicy: 'cache-and-network',
 			variables: { input: initialInput },
