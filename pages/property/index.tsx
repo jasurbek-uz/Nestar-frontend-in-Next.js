@@ -11,11 +11,11 @@ import { Property } from '../../libs/types/property/property';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import { Direction, Message } from '../../libs/enums/common.enum';
-import { useMutation, useQuery } from "@apollo/client";
-import { GET_PROPERTIES } from "../../apollo/user/query";
-import { T } from "../../libs/types/common";
-import { LIKE_TARGET_PROPERTY } from "../../apollo/user/mutation";
-import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from "../../libs/sweetAlert";
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_PROPERTIES } from '../../apollo/user/query';
+import { T } from '../../libs/types/common';
+import { LIKE_TARGET_PROPERTY } from '../../apollo/user/mutation';
+import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -36,10 +36,10 @@ const PropertyList: NextPage = ({ initialInput, ...props }: any) => {
 	const [sortingOpen, setSortingOpen] = useState(false);
 	const [filterSortName, setFilterSortName] = useState('New');
 
-  /** APOLLO REQUESTS **/
-    const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
+	/** APOLLO REQUESTS **/
+	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
 
-  const {
+	const {
 		loading: getPropertiesLoading,
 		data: getPropertiesData,
 		error: getPropertiesError,
@@ -49,12 +49,12 @@ const PropertyList: NextPage = ({ initialInput, ...props }: any) => {
 		variables: { input: initialInput },
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-      setProperties(data?.getProperties?.list);
-      setTotal(data?.getProperties?.metaCounter[0]?.total);
+			setProperties(data?.getProperties?.list);
+			setTotal(data?.getProperties?.metaCounter[0]?.total);
 		},
 	});
 
-	/** LIFECYCLES **/
+	/** LIFECYCLE **/
 	useEffect(() => {
 		if (router.query.input) {
 			const inputObj = JSON.parse(router?.query?.input as string);
@@ -64,11 +64,11 @@ const PropertyList: NextPage = ({ initialInput, ...props }: any) => {
 		setCurrentPage(searchFilter.page === undefined ? 1 : searchFilter.page);
 	}, [router]);
 
-  useEffect(() => {
-    // backend refetch
-    console.log('searchFilter', searchFilter);
-    getPropertiesRefetch({ input: searchFilter }).then();
-  }, [searchFilter]);
+	useEffect(() => {
+		// backend refetch
+		console.log('searchFilter', searchFilter);
+		getPropertiesRefetch({ input: searchFilter }).then();
+	}, [searchFilter]);
 
 	/** HANDLERS **/
 	const handlePaginationChange = async (event: ChangeEvent<unknown>, value: number) => {
@@ -81,16 +81,16 @@ const PropertyList: NextPage = ({ initialInput, ...props }: any) => {
 			},
 		);
 		setCurrentPage(value);
-  };
+	};
 
-  	// execute likeTargetProperty Mutation
-  const likePropertyHandler = async (user: T, id: string) => {
+	// execute likeTargetProperty Mutation
+	const likePropertyHandler = async (user: T, id: string) => {
 		try {
 			if (!id) return;
 			if (!user._id) throw new Error(Message.SOMETHING_WENT_WRONG);
 			await likeTargetProperty({ variables: { input: id } });
 			await getPropertiesRefetch({ input: initialInput });
-			await sweetTopSmallSuccessAlert('succes', 800);
+			await sweetTopSmallSuccessAlert('success', 800);
 		} catch (err: any) {
 			console.log('Error, likePropertyHandler:', err.message);
 			sweetMixinErrorAlert(err.message).then();
@@ -179,9 +179,9 @@ const PropertyList: NextPage = ({ initialInput, ...props }: any) => {
 									</div>
 								) : (
 									properties.map((property: Property) => {
-                    return (
-                      <PropertyCard property={property} likePropertyHandler={likePropertyHandler} key={property?._id} />
-                    );
+										return (
+											<PropertyCard property={property} likePropertyHandler={likePropertyHandler} key={property?._id} />
+										);
 									})
 								)}
 							</Stack>
@@ -201,7 +201,7 @@ const PropertyList: NextPage = ({ initialInput, ...props }: any) => {
 								{properties.length !== 0 && (
 									<Stack className="total-result">
 										<Typography>
-											Total {total} propert{total > 1 ? 'ies' : 'y'} available
+											Total {total} property{total > 1 ? 'ies' : 'y'} available
 										</Typography>
 									</Stack>
 								)}
