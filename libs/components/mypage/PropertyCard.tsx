@@ -130,3 +130,4 @@ export const PropertyCard = (props: PropertyCardProps) => {
 			</Stack>
 		);
 };
+export default PropertyCard
