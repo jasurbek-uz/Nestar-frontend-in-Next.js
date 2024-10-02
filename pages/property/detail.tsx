@@ -27,7 +27,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import 'swiper/css';
 import 'swiper/css/pagination';
-import { GET_PROPERTIES } from "../../apollo/user/query";
+import { GET_PROPERTIES, GET_PROPERTY } from "../../apollo/user/query";
 import { T } from "../../libs/types/common";
 import { Direction, Message } from "../../libs/enums/common.enum";
 import { CREATE_COMMENT, LIKE_TARGET_PROPERTY } from "../../apollo/user/mutation";
@@ -68,7 +68,7 @@ const PropertyDetail: NextPage = ({ initialComment, ...props }: any) => {
 			data: getPropertyData,
 			error: getPropertyError,
 			refetch: getPropertyRefetch,
-		} = useQuery(GET_PROPERTIES, {
+		} = useQuery(GET_PROPERTY, {
 			fetchPolicy: 'network-only',
       variables: { input: propertyId },
       skip: !propertyId, 
