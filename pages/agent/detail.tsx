@@ -18,11 +18,10 @@ import { Comment } from '../../libs/types/comment/comment';
 import { CommentGroup } from '../../libs/enums/comment.enum';
 import { Messages, REACT_APP_API_URL } from '../../libs/config';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { CREATE_COMMENT, LIKE_TARGET_PROPERTY } from "../../apollo/user/mutation";
-import { GET_MEMBER, GET_PROPERTIES } from "../../apollo/user/query";
-import { T } from "../../libs/types/common";
-import { GET_COMMENTS } from "../../apollo/admin/query";
-
+import { CREATE_COMMENT, LIKE_TARGET_PROPERTY } from '../../apollo/user/mutation';
+import { GET_MEMBER, GET_PROPERTIES } from '../../apollo/user/query';
+import { T } from '../../libs/types/common';
+import { GET_COMMENTS } from '../../apollo/admin/query';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -48,44 +47,57 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		commentRefId: '',
 	});
 
-  /** APOLLO REQUESTS **/
-  const [createComment] = useMutation(CREATE_COMMENT);
-  const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
+	/** APOLLO REQUESTS **/
+	const [createComment] = useMutation(CREATE_COMMENT);
+	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
 
-  const {
+	const {
 		loading: getMemberLoading,
 		data: getMemberData,
 		error: getMemberError,
 		refetch: getMemberRefetch,
 	} = useQuery(GET_MEMBER, {
 		fetchPolicy: 'network-only',
-    variables: { input: agentId },
-    skip:!agentId,
+		variables: { input: agentId },
+		skip: !agentId,
 		onCompleted: (data: T) => {
 			setAgent(data?.getMember);
-      setSearchFilter({ ...searchFilter, search: { memberId: data?.getMember?._id }, });
-      setCommentInquiry({ ...commentInquiry, search: { commentRefId: data?.getMember?._id } });
-      setInsertCommentData({ ...insertCommentData,  commentRefId: data?.getMember?._id } );
+			setSearchFilter({
+				...searchFilter,
+				search: {
+					memberId: data?.getMember?._id,
+				},
+			});
+			setCommentInquiry({
+				...commentInquiry,
+				search: {
+					commentRefId: data?.getMember?._id,
+				},
+			});
+			setInsertCommentData({
+				...insertCommentData,
+				commentRefId: data?.getMember?._id,
+			});
 		},
-  });
-  
-  const {
+	});
+
+	const {
 		loading: getPropertiesLoading,
 		data: getPropertiesData,
 		error: getPropertiesError,
 		refetch: getPropertiesRefetch,
 	} = useQuery(GET_PROPERTIES, {
 		fetchPolicy: 'network-only',
-    variables: { input: searchFilter },
-    skip:!searchFilter.search.memberId,
+		variables: { input: searchFilter },
+		skip: !searchFilter.search.memberId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
 			setAgentProperties(data?.getProperties?.list);
 			setPropertyTotal(data?.getProperties?.metaCounter[0]?.total ?? 0);
 		},
-  });
-  
-  const {
+	});
+
+	const {
 		loading: getCommentsLoading,
 		data: getCommentsData,
 		error: getCommentsError,
@@ -96,18 +108,27 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		skip: !commentInquiry.search.commentRefId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setAgentComments(data?.getCommnets?.list);
-			setCommentTotal(data?.getComments?.metaCounter[0]?.total ?? 0);
+			setAgentComments(data?.getComments?.list);
+			setCommentTotal(data?.getComments?.metaCounter[0].total ?? 0);
 		},
 	});
-  
+
 	/** LIFECYCLES **/
 	useEffect(() => {
 		if (router.query.agentId) setAgentId(router.query.agentId as string);
 	}, [router]);
 
-	useEffect(() => {}, [searchFilter]);
-	useEffect(() => {}, [commentInquiry]);
+	useEffect(() => {
+		if (searchFilter.search.memberId) {
+			getPropertiesRefetch({ variables: { input: searchFilter } }).then();
+		}
+	}, [searchFilter]);
+
+	useEffect(() => {
+		if (commentInquiry.search.commentRefId) {
+			getCommentsRefetch({ variables: { input: commentInquiry } }).then();
+		}
+	}, [commentInquiry]);
 
 	/** HANDLERS **/
 	const redirectToMemberPageHandler = async (memberId: string) => {
@@ -127,34 +148,43 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 	const commentPaginationChangeHandler = async (event: ChangeEvent<unknown>, value: number) => {
 		commentInquiry.page = value;
 		setCommentInquiry({ ...commentInquiry });
-  };
-  
-  const createCommentHandler = async () => {
+	};
+
+	const createCommentHandler = async () => {
 		try {
-      if (!user._id) throw new Error(Messages.error2);
-      if (user._id === agentId) throw new Error('Cannot write a review for yourself');
-			await createComment({ variables: { input: insertCommentData, }, });
-			await setInsertCommentData({ ...insertCommentData, commentContent:'' });
-      await getCommentsRefetch({ input: commentInquiry });
-		} catch (err: any) {
-			sweetMixinErrorAlert(err.message).then();
-		}
-  };
-  
-  const likePropertyHandler = async (user: any, id: string) => {
-		try {
-			if (!id) return;
 			if (!user._id) throw new Error(Messages.error2);
-			await likeTargetProperty({ variables: { input: id } });
-			await getPropertiesRefetch({ input: searchFilter });
-			await sweetTopSmallSuccessAlert('success', 800);
+			if (user._id === agentId) throw new Error('Cannot write a review for yourself!');
+
+			await createComment({
+				variables: {
+					input: insertCommentData,
+				},
+			});
+
+			setInsertCommentData({ ...insertCommentData, commentContent: '' });
+			await getCommentsRefetch({ input: commentInquiry });
 		} catch (err: any) {
-			console.log('Error, likePropertyHandler:', err.message);
-			sweetMixinErrorAlert(err.message).then();
+			sweetErrorHandling(err).then();
 		}
 	};
 
-	
+	const likePropertyHandler = async (user: any, id: string) => {
+		try {
+			if (!id) return;
+			if (!user._id) throw new Error(Messages.error2);
+
+			await likeTargetProperty({
+				variables: {
+					input: id,
+				},
+			});
+
+			await getPropertiesRefetch({ input: searchFilter });
+			await sweetTopSmallSuccessAlert('success', 800);
+		} catch (err: any) {
+			sweetMixinErrorAlert(err.message).then();
+		}
+	};
 
 	if (device === 'mobile') {
 		return <div>AGENT DETAIL PAGE MOBILE</div>;
@@ -180,7 +210,11 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 							{agentProperties.map((property: Property) => {
 								return (
 									<div className={'wrap-main'} key={property?._id}>
-										<PropertyBigCard property={property} likePropertyHandler={likePropertyHandler} key={property?._id} />
+										<PropertyBigCard
+											likePropertyHandler={likePropertyHandler}
+											property={property}
+											key={property?._id}
+										/>
 									</div>
 								);
 							})}
