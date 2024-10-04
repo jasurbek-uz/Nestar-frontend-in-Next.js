@@ -1,14 +1,14 @@
 import React from 'react';
 import { Stack, Typography, Box } from '@mui/material';
-import useDeviceDetect from '../../../hooks/useDeviceDetect';
+import useDeviceDetect from '../../../libs/hooks/useDeviceDetect';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Property } from '../../../types/property/property';
+import { Property } from '../../../libs/types/property/property';
 import Link from 'next/link';
-import { formatterStr } from '../../../utils';
-import { REACT_APP_API_URL, topPropertyRank } from '../../../config';
+import { formatterStr } from '../../../libs/utils';
+import { REACT_APP_API_URL } from '../../../libs/config';
 import { useReactiveVar } from '@apollo/client';
-import { userVar } from '../../../../apollo/store';
+import { userVar } from '../../../apollo/store';
 import IconButton from '@mui/material/IconButton';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 
@@ -41,7 +41,7 @@ const PropertyCard = (props: PropertyCardType) => {
 					>
 						<img src={imagePath} alt="" />
 					</Link>
-					{property && property?.propertyRank > topPropertyRank && (
+					{property && property?.propertyRank > 0 && (
 						<Box component={'div'} className={'top-badge'}>
 							<img src="/img/icons/electricity.svg" alt="" />
 							<Typography>TOP</Typography>

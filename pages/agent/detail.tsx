@@ -43,7 +43,8 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		commentRefId: '',
 	});
 
-	/** APOLLO REQUESTS **/
+  /** APOLLO REQUESTS **/
+  
 	/** LIFECYCLES **/
 	useEffect(() => {
 		if (router.query.agentId) setMbId(router.query.agentId as string);

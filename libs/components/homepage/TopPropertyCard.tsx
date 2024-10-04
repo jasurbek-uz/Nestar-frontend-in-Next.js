@@ -12,7 +12,7 @@ import { userVar } from '../../../apollo/store';
 
 interface TopPropertyCardProps {
 	property: Property;
-  likePropertyHandler: any;
+	likePropertyHandler: any;
 }
 
 const TopPropertyCard = (props: TopPropertyCardProps) => {
@@ -21,8 +21,8 @@ const TopPropertyCard = (props: TopPropertyCardProps) => {
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
 
-  /** HANDLERS **/
-  const pushDetailHandler = async (propertyId: string) => {
+	/** HANDLERS **/
+	const pushDetailHandler = async (propertyId: string) => {
 		console.log('propertyId:', propertyId);
 		await router.push({ pathname: '/property/detail', query: { id: propertyId } });
 	};

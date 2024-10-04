@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { Property } from '../../types/property/property';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
-import { REACT_APP_API_URL, topPropertyRank } from '../../config';
+import { REACT_APP_API_URL } from '../../config';
 import { useRouter } from 'next/router';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
@@ -19,8 +19,8 @@ const PopularPropertyCard = (props: PopularPropertyCardProps) => {
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
 
-  /** HANDLERS **/
-  const pushDetailHandler = async (propertyId: string) => {
+	/** HANDLERS **/
+	const pushDetailHandler = async (propertyId: string) => {
 		console.log('propertyId:', propertyId);
 		await router.push({ pathname: '/property/detail', query: { id: propertyId } });
 	};
@@ -36,7 +36,7 @@ const PopularPropertyCard = (props: PopularPropertyCardProps) => {
 						pushDetailHandler(property._id);
 					}}
 				>
-					{property && property?.propertyRank >= topPropertyRank ? (
+					{property?.propertyRank && property?.propertyRank >= 50 ? (
 						<div className={'status'}>
 							<img src="/img/icons/electricity.svg" alt="" />
 							<span>top</span>
@@ -95,7 +95,7 @@ const PopularPropertyCard = (props: PopularPropertyCardProps) => {
 						pushDetailHandler(property._id);
 					}}
 				>
-					{property && property?.propertyRank >= topPropertyRank ? (
+					{property?.propertyRank && property?.propertyRank >= 50 ? (
 						<div className={'status'}>
 							<img src="/img/icons/electricity.svg" alt="" />
 							<span>top</span>

@@ -8,12 +8,12 @@ import { Autoplay, Navigation, Pagination } from 'swiper';
 import { Property } from '../../types/property/property';
 import { PropertiesInquiry } from '../../types/property/property.input';
 import TrendPropertyCard from './TrendPropertyCard';
-import { useMutation, useQuery } from "@apollo/client";
-import { GET_PROPERTIES } from "../../../apollo/user/query";
-import { T } from "../../types/common";
-import { LIKE_TARGET_PROPERTY } from "../../../apollo/user/mutation";
-import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from "../../sweetAlert";
-import { Message } from "../../enums/common.enum";
+import { useMutation, useQuery } from '@apollo/client';
+import { GET_PROPERTIES } from '../../../apollo/user/query';
+import { T } from '../../types/common';
+import { LIKE_TARGET_PROPERTY } from '../../../apollo/user/mutation';
+import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../sweetAlert';
+import { Message } from '../../enums/common.enum';
 
 interface TrendPropertiesProps {
 	initialInput: PropertiesInquiry;
@@ -24,38 +24,43 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 	const device = useDeviceDetect();
 	const [trendProperties, setTrendProperties] = useState<Property[]>([]);
 
-  /** APOLLO REQUESTS **/
-  const [likeTargetProperty]= useMutation(LIKE_TARGET_PROPERTY)
-  const {
-    loading: getPropertiesLoading,
-    data: getPropertiesData,
-    error: getPropertiesError,
-    refetch:getPropertiesRefetch,
-  } = useQuery(GET_PROPERTIES, {
-    fetchPolicy: "cache-and-network",
-    variables: { input: initialInput },
-    notifyOnNetworkStatusChange: true,
-    onCompleted: (data: T) => {
-      setTrendProperties(data?.getProperties?.list);
-    }
-  });
+	/** APOLLO REQUESTS **/
+	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY); // Declares a mutation hook for liking a property using the Apollo Client, which returns a function (likeTargetProperty) that can be called to trigger the mutation.
 
-  /** HANDLERS **/
-  const likePropertyHandler = async (user:T, id:string) => {
-    try {
-      if (!id) return;
-      if(!user._id) throw new Error (Message.SOMETHING_WENT_WRONG)
-      // execute likeTargetProperty Mutation
-      await likeTargetProperty({ variables: { input: id } });
-      await getPropertiesRefetch({ input: initialInput });
-      await sweetTopSmallSuccessAlert("succes", 800)
-    } catch (err:any) {
-      console.log("Error, likePropertyHandler:", err.message);
-      sweetMixinErrorAlert(err.message).then();
-    }
-  }
+	const {
+		loading: getPropertiesLoading, // Destructures the loading state from useQuery, a boolean indicating if the query is in progress.
+		data: getPropertiesData, // Destructures the data returned by the query, which holds the response from the GraphQL server.
+		error: getPropertiesError, // Destructures the error state, which holds any errors that occur during the query.
+		refetch: getPropertiesRefetch, // Destructures the refetch function to allow re-executing the query when needed.
+	} = useQuery(GET_PROPERTIES, {
+		// Executes a GraphQL query named GET_PROPERTIES using the Apollo Client.
+		fetchPolicy: 'cache-and-network', // Sets the fetch policy to prioritize fetching from the network but also allows cached data to be returned while the network request is in progress.
+		variables: { input: initialInput }, // Specifies the input variables for the query, passing the initialInput as the query parameter.
+		notifyOnNetworkStatusChange: true, // Enables notifications when the network status changes, useful for tracking loading states.
+		onCompleted: (data: T) => {
+			// Callback function that runs when the query is successfully completed.
+			setTrendProperties(data?.getProperties?.list); // Updates the trendProperties state with the list of properties received from the query response.
+		},
+	});
 
-	if (trendProperties) console.log('trendProperties:', trendProperties);
+	/** HANDLERS **/
+	const likePropertyHandler = async (user: T, id: string) => {
+		try {
+			if (!id) return;
+			if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
+			await likeTargetProperty({
+				variables: { input: id },
+			});
+			await getPropertiesRefetch({ input: initialInput });
+
+			await sweetTopSmallSuccessAlert('success', 800);
+		} catch (err: any) {
+			console.log('ERROR, likePropertyHandler:', err.message);
+			sweetMixinErrorAlert(err.message).then();
+		}
+	};
+
+	if (trendProperties) console.log('trendProperties: +++', trendProperties);
 	if (!trendProperties) return null;
 
 	if (device === 'mobile') {
@@ -130,7 +135,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 								{trendProperties.map((property: Property) => {
 									return (
 										<SwiperSlide key={property._id} className={'trend-property-slide'}>
-											<TrendPropertyCard property={property}  likePropertyHandler={likePropertyHandler}/>
+											<TrendPropertyCard property={property} likePropertyHandler={likePropertyHandler} />
 										</SwiperSlide>
 									);
 								})}
@@ -143,6 +148,7 @@ const TrendProperties = (props: TrendPropertiesProps) => {
 	}
 };
 
+// Qiymatlar
 TrendProperties.defaultProps = {
 	initialInput: {
 		page: 1,
@@ -154,7 +160,3 @@ TrendProperties.defaultProps = {
 };
 
 export default TrendProperties;
-function sweettMixinErrorAlert(message: any) {
-  throw new Error("Function not implemented.");
-}
-

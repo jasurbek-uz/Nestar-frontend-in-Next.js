@@ -11,8 +11,8 @@ import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
 
 interface TrendPropertyCardProps {
-  property: Property;
-  likePropertyHandler: any;
+	property: Property;
+	likePropertyHandler: any;
 }
 
 const TrendPropertyCard = (props: TrendPropertyCardProps) => {
@@ -21,8 +21,8 @@ const TrendPropertyCard = (props: TrendPropertyCardProps) => {
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
 
-  /** HANDLERS **/
-  const pushDetailHandler = async (propertyId: string) => {
+	/** HANDLERS **/
+	const pushDetailHandler = async (propertyId: string) => {
 		console.log('propertyId:', propertyId);
 		await router.push({ pathname: '/property/detail', query: { id: propertyId } });
 	};
