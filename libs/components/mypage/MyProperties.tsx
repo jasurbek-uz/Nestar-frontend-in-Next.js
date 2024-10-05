@@ -70,7 +70,7 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 							<Typography className="title-text">Date Published</Typography>
 							<Typography className="title-text">Status</Typography>
 							<Typography className="title-text">View</Typography>
-							<Typography className="title-text">Action</Typography>
+							{searchFilter.search.propertyStatus === 'ACTIVE' && <Typography className="title-text">Action</Typography>}
 						</Stack>
 
 						{agentProperties?.length === 0 ? (
