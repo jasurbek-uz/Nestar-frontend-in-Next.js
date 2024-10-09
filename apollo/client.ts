@@ -6,6 +6,8 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { onError } from '@apollo/client/link/error';
 import { getJwtToken } from '../libs/auth';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
+import { sweetErrorAlert } from "../libs/sweetAlert";
+import { Message } from "../libs/enums/common.enum";
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
 function getHeaders() {
@@ -28,40 +30,41 @@ const tokenRefreshLink = new TokenRefreshLink({
 });
 
 function createIsomorphicLink() {
-	if (typeof window !== 'undefined') {
-		const authLink = new ApolloLink((operation, forward) => {
-			operation.setContext(({ headers = {} }) => ({
-				headers: {
-					...headers,
-					...getHeaders(),
-				},
-			}));
-			console.warn('requesting.. ', operation);
-			return forward(operation);
-		});
+  if (typeof window !== 'undefined') {
+    const authLink = new ApolloLink((operation, forward) => {
+      operation.setContext(({ headers = {} }) => ({
+        headers: {
+          ...headers,
+          ...getHeaders(),
+        },
+      }));
+      console.warn('requesting.. ', operation);
+      return forward(operation);
+    });
 
-		// @ts-ignore
-		const link = new createUploadLink({
-			uri: process.env.REACT_APP_API_GRAPHQL_URL,
-		});
+    // @ts-ignore
+    const link = new createUploadLink({
+      uri: process.env.REACT_APP_API_GRAPHQL_URL,
+    });
 
-		/* WEBSOCKET SUBSCRIPTION LINK */
-		const wsLink = new WebSocketLink({
-			uri: process.env.REACT_APP_API_WS ?? 'ws://127.0.0.1:3007',
-			options: {
-				reconnect: false,
-				timeout: 30000,
-				connectionParams: () => {
-					return { headers: getHeaders() };
-				},
-			},
-		});
+    /* WEBSOCKET SUBSCRIPTION LINK */
+    const wsLink = new WebSocketLink({
+      uri: process.env.REACT_APP_API_WS ?? 'ws://127.0.0.1:3007',
+      options: {
+        reconnect: false,
+        timeout: 30000,
+        connectionParams: () => {
+          return { headers: getHeaders() };
+        },
+      },
+    });
 
-		const errorLink = onError(({ graphQLErrors, networkError, response }) => {
-			if (graphQLErrors) {
-				graphQLErrors.map(({ message, locations, path, extensions }) =>
-					console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
-				);
+    const errorLink = onError(({ graphQLErrors, networkError, response }) => {
+      if (graphQLErrors) {
+        graphQLErrors.map(({ message, locations, path, extensions }) => { 
+          console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`);
+          if (!message.includes('input')) sweetErrorAlert(message)
+      });
 			}
 			if (networkError) console.log(`[Network error]: ${networkError}`);
 			// @ts-ignore
