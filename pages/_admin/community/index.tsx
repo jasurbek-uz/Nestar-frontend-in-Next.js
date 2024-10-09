@@ -32,7 +32,7 @@ const AdminCommunity: NextPage = ({ initialInquiry, ...props }: any) => {
   /** APOLLO REQUESTS **/
   const [updateBoardArticleByAdmin] = useMutation(UPDATE_BOARD_ARTICLE_BY_ADMIN);
 	const [removeBoardArticleByAdmin] = useMutation(REMOVE_BOARD_ARTICLE_BY_ADMIN);
-
+  
 	const {
 		loading: getAllBoardArticlesByAdminLoading,
 		data: getAllBoardArticlesByAdminData,
@@ -121,7 +121,7 @@ const AdminCommunity: NextPage = ({ initialInquiry, ...props }: any) => {
 
 	const updateArticleHandler = async (updateData: BoardArticleUpdate) => {
     try {
-      await updateBoardArticleByAdmin({ variables: { input: communityInquiry } });
+      await updateBoardArticleByAdmin({ variables: { input: updateData } });
 			console.log('+updateData: ', updateData);
 
       menuIconCloseHandler();

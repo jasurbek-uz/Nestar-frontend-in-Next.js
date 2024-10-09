@@ -65,7 +65,7 @@ const AdminUsers: NextPage = ({ initialInquiry, ...props }: any) => {
 	const changeRowsPerPageHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		membersInquiry.limit = parseInt(event.target.value, 10);
     membersInquiry.page = 1;
-      await getAllMembersRefetch({ input: membersInquiry });
+    await getAllMembersRefetch({ input: membersInquiry });
 		setMembersInquiry({ ...membersInquiry });
 	};
 

@@ -43,8 +43,8 @@ const AdminProperties: NextPage = ({ initialInquiry, ...props }: any) => {
 		variables: { input: propertiesInquiry },
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setProperties(data?.getPropertiesByAdmin?.list);
-			setPropertiesTotal(data?.getPropertiesByAdmin?.metaCounter[0]?.total ?? 0);
+			setProperties(data?.getAllPropertiesByAdmin?.list);
+			setPropertiesTotal(data?.getAllPropertiesByAdmin?.metaCounter[0]?.total ?? 0);
 		},
 	});
 
@@ -56,14 +56,14 @@ const AdminProperties: NextPage = ({ initialInquiry, ...props }: any) => {
 	/** HANDLERS **/
 	const changePageHandler = async (event: unknown, newPage: number) => {
     propertiesInquiry.page = newPage + 1;
-     await getAllPropertiesByAdminRefetch({ input: propertiesInquiry });
+    await getAllPropertiesByAdminRefetch({ input: propertiesInquiry });
 		setPropertiesInquiry({ ...propertiesInquiry });
 	};
 
 	const changeRowsPerPageHandler = async (event: React.ChangeEvent<HTMLInputElement>) => {
 		propertiesInquiry.limit = parseInt(event.target.value, 10);
     propertiesInquiry.page = 1;
-     getAllPropertiesByAdminRefetch({ input: propertiesInquiry });
+    getAllPropertiesByAdminRefetch({ input: propertiesInquiry });
 		setPropertiesInquiry({ ...propertiesInquiry });
 	};
 
