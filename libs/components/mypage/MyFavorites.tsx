@@ -21,7 +21,6 @@ const MyFavorites: NextPage = () => {
   /** APOLLO REQUESTS **/
   const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
 	
-
 	const {
 		loading: getFavoritesLoading,
 		data: getFavoritesData,
